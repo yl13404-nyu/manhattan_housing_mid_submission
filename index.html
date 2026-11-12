@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Explore housing growth, gross rent and rent burden across Manhattan's ten historical PUMAs, using ACS 2006–2011 estimates.">
+  <title>Manhattan Housing Growth, Rent Growth, and Rent Burden · 2006–2011</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b6069'/%3E%3Cpath d='M8 24V12l8-7 8 7v12h-6v-8h-4v8z' fill='white'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="vendor/d3.v7.min.js"></script>
+  <script type="module" src="js/app.mjs?v=mainland-20261112"></script>
+</head>
+<body>
+  <main class="page-shell">
+    <header class="page-header">
+      <div class="eyebrow"><span class="brand-mark" aria-hidden="true"></span> MANHATTAN / HOUSING RESEARCH</div>
+      <div class="header-main">
+        <div>
+          <h1>Manhattan Housing Growth, Rent Growth, and Rent Burden</h1>
+        </div>
+        <div class="source-stamp">U.S. CENSUS BUREAU<span>ACS 1-year estimates · 2006–2011</span></div>
+      </div>
+    </header>
+
+    <div id="load-status" class="load-status" role="status">Loading Manhattan data…</div>
+    <section id="dashboard" hidden aria-label="Interactive Manhattan housing dashboard">
+      <div class="controls">
+        <div class="period-block"><span class="control-caption">COMPARISON PERIOD</span><strong>2006 <span aria-hidden="true">→</span> <span id="end-year">2011</span></strong></div>
+        <div class="year-controls"><span class="control-caption" id="year-label">SELECT END YEAR</span><div id="year-buttons" class="year-buttons" role="group" aria-labelledby="year-label"></div></div>
+        <div class="selection-controls"><span id="selection-status" aria-live="polite">All 10 PUMAs</span><button type="button" id="clear-selection" disabled><span aria-hidden="true">↺</span> Clear selection</button></div>
+      </div>
+
+      <div class="reading-guide"><p>Click to select across all views · Ctrl-click to select more</p></div>
+
+      <div class="dashboard-grid">
+        <section class="view-panel map-panel" aria-labelledby="map-title">
+          <div class="view-heading"><span class="view-number">01</span><div><h2 id="map-title">Baseline median rent</h2><p>2006 median monthly gross rent · USD</p></div></div>
+          <div class="chart-host map-host" id="map-chart"></div>
+          <div class="map-legend"><span class="legend-heading">2006 median monthly gross rent</span><svg id="map-legend" aria-label="2006 median monthly gross rent color legend in dollars"></svg></div>
+          <p class="view-footnote">Labels 01–10 refer to PUMAs 03801–03810.</p>
+        </section>
+
+        <div class="comparison-group">
+          <section class="view-panel scatter-panel" aria-labelledby="growth-title">
+            <div class="view-heading"><span class="view-number">02</span><div><h2 id="growth-title">Growth & housing scale</h2><p>Housing growth vs. nominal rent growth</p></div></div>
+            <div class="chart-host" id="growth-chart"></div>
+            <div class="size-legend"><span class="legend-heading">Bubble diameter = housing units · <span class="endpoint-year">2011</span></span><svg id="size-legend" aria-label="Bubble diameters are proportional to total housing units: 50,000, 100,000 and 150,000"></svg></div>
+          </section>
+
+          <section class="view-panel scatter-panel" aria-labelledby="burden-title">
+            <div class="view-heading"><span class="view-number">03</span><div><h2 id="burden-title">Baseline rent burden</h2><p>2006 burden vs. subsequent rent growth</p></div></div>
+            <div class="chart-host" id="burden-chart"></div>
+            <div class="region-legend"><div id="region-legend" class="region-items"></div></div>
+            <p class="view-footnote">Rent burden = gross rent ≥30% of household income.</p>
+          </section>
+        </div>
+      </div>
+
+      <footer class="page-footer">
+        <div class="bound-footnote"><p><strong>* Rent-growth lower bounds.</strong> Marks labeled with an asterisk show the minimum known growth where median gross rent is at least $2,000. Actual growth may be higher; these are not exact values or confidence limits. Bubble diameter still shows housing units; regional shapes are unchanged.</p></div>
+      </footer>
+    </section>
+    <noscript>This dashboard requires JavaScript to display its coordinated D3 views.</noscript>
+  </main>
+  <aside id="detail-tooltip" class="detail-tooltip" role="tooltip" hidden></aside>
+</body>
+</html>
