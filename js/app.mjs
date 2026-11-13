@@ -1,4 +1,4 @@
-import { YEARS, buildModel, isNumber, formatInteger, formatPercent, formatRent, formatRentGrowth, escapeHTML } from "./model.mjs";
+import { YEARS, buildModel, isNumber, formatInteger, formatPercent, formatPercentagePoints, formatRent, formatRentGrowth, escapeHTML } from "./model.mjs?v=burden-rank-20261112";
 
 const d3 = globalThis.d3;
 const $ = selector => document.querySelector(selector);
@@ -24,8 +24,13 @@ function tooltipHTML(row, view) {
     ${field("Housing growth from 2006", formatPercent(row.housing_growth_pct, true))}
     ${field("Nominal rent growth from 2006", formatRentGrowth(row))}</dl>`;
   if (view === "burden") {
+    const burdenRank = model.burdenRanksByYear.get(state.year).get(row.puma);
     const burdenRow = (label, key, format) => `<tr><th scope="row">${label}</th><td>${format(base[key])}</td><td>${format(current[key])}</td></tr>`;
-    html += `<table class="tooltip-burden"><caption>Rent burden · gross rent ≥30% of income</caption><thead><tr><th scope="col">Measure</th><th scope="col">2006</th><th scope="col">${state.year}</th></tr></thead><tbody>
+    html += `<dl class="tooltip-metrics">
+      ${field("Rent burden change from 2006", formatPercentagePoints(burdenRank?.change))}
+      ${field("Burden-change rank", burdenRank ? `${burdenRank.rank} of ${burdenRank.total}` : "Not available")}
+      </dl><p class="tooltip-note">Change = ${state.year} share − 2006 share, in percentage points (pp). Rank 1 = largest increase across Manhattan PUMAs; equal changes share a rank.</p>
+      <table class="tooltip-burden"><caption>Rent burden · gross rent ≥30% of income</caption><thead><tr><th scope="col">Measure</th><th scope="col">2006</th><th scope="col">${state.year}</th></tr></thead><tbody>
       ${burdenRow("Burdened household share", "rent_burden_pct", formatPercent)}
       ${burdenRow("Burdened households", "rent_burdened_households", formatInteger)}
       ${burdenRow("Computable households", "rent_computable_households", formatInteger)}

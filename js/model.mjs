@@ -26,6 +26,21 @@ export function createDomains(comparisons) {
   };
 }
 
+export function rankBurdenChanges(rows) {
+  const changes = rows
+    .filter(row => isNumber(row.rent_burden_pct_base) && isNumber(row.rent_burden_pct_end))
+    .map(row => ({ puma: row.puma, change: row.rent_burden_pct_end - row.rent_burden_pct_base }))
+    .sort((a, b) => b.change - a.change);
+  const ranks = new Map();
+  let rank = 0;
+  changes.forEach((entry, index) => {
+    // 全部 PUMA 按百分点变化降序排列；相同变化并列 / Equal changes share a competition rank.
+    if (index === 0 || entry.change !== changes[index - 1].change) rank = index + 1;
+    ranks.set(entry.puma, { change: entry.change, rank, total: changes.length });
+  });
+  return ranks;
+}
+
 export function buildModel(annual, comparisons, geography) {
   const annualByKey = new Map(annual.map(r => [`${r.year}:${r.puma}`, r]));
   const comparisonsByYear = new Map(YEARS.map(year => [year, comparisons.filter(r => r.end_year === year)]));
@@ -40,7 +55,8 @@ export function buildModel(annual, comparisons, geography) {
         || !annualByKey.has(`2006:${row.puma}`) || !annualByKey.has(`${year}:${row.puma}`)) throw new Error("Invalid baseline or PUMA join.");
     }
   }
-  return { annualByKey, comparisonsByYear, geography, domains: createDomains(comparisons) };
+  const burdenRanksByYear = new Map(YEARS.map(year => [year, rankBurdenChanges(comparisonsByYear.get(year))]));
+  return { annualByKey, comparisonsByYear, burdenRanksByYear, geography, domains: createDomains(comparisons) };
 }
 
 const integerFormat = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
@@ -48,6 +64,10 @@ export const formatInteger = value => isNumber(value) ? integerFormat.format(val
 export function formatPercent(value, signed = false) {
   if (!isNumber(value)) return "Not available";
   return `${signed && value > 0 ? "+" : ""}${value.toFixed(2)}%`;
+}
+export function formatPercentagePoints(value) {
+  if (!isNumber(value)) return "Not available";
+  return `${value > 0 ? "+" : ""}${value.toFixed(2)} pp`;
 }
 export function formatRent(annual) {
   if (annual.median_gross_rent_status === "top_coded_ge_2000" && isNumber(annual.median_gross_rent_lower_bound)) {
